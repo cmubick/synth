@@ -1,0 +1,16 @@
+.DS_Store
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+
+# Engine desktop test output
+Engine/build/
+
+# Android (later)
+.gradle/
+local.properties
+*.iml
+.cxx/
