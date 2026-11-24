@@ -12,7 +12,9 @@ screenshots, age rating) follows the same layout as Skate's and Mahjong's
   Deploy from a branch → `main`, folder `/docs`), as for Skate.
 - **App Privacy:** Data Not Collected. Checked against the code: no network
   requests of its own (only Apple's StoreKit), no analytics, ads, accounts,
-  links or third-party SDKs, no microphone yet. `iOS/Synth/PrivacyInfo.xcprivacy`
+  links or third-party SDKs, no microphone yet. "Send feedback" only opens an
+  email the person writes and sends themselves, which isn't collection by the
+  app. `iOS/Synth/PrivacyInfo.xcprivacy`
   declares UserDefaults (CA92.1) only. Revisit when recording (microphone) or
   saving arrives.
 - **App icon:** `AppStore/icon/icon-1024.png`, made by `AppStore/make_icon.sh`.

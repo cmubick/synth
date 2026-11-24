@@ -60,6 +60,11 @@ The ☰ button at the top right opens **More**:
 - **Tip jar**: 8-bit, like Skate's, in the synth's colors (`TipJarCard.swift`).
   SMALL / GENEROUS / BIG (`synth.tip.small/.medium/.large`, $0.99 / $2.99 /
   $4.99). Tips unlock nothing; the jar fills up as tips come in (`tipsGiven`).
+- **Send feedback** (`UI/Feedback.swift`): an email to info@tuesdaygames.com,
+  subject "808Synth feedback", with the app version, iOS version, device model
+  and full-version status filled in. Uses Mail if it's set up, else a `mailto:`
+  link (the default mail app), else shows the address to copy. The app sends
+  nothing itself.
 - **Settings** (saved in UserDefaults): Haptics (`haptics`, on) and Keep the
   screen on while the beat plays (`keepAwakeWhilePlaying`, on).
 
@@ -85,7 +90,7 @@ notes for App Store Connect are in `AppStore/listing.md`.
 
 ## Testing
 
-Store tests (Swift Testing, against `Synth.storekit`): run the Synth scheme's
+App tests (Swift Testing: the store against `Synth.storekit`, and the feedback email): run the Synth scheme's
 tests in Xcode (⌘U), or
 
 ```bash

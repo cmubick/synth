@@ -4,6 +4,12 @@ Decisions and to-dos, newest first. The README describes what's built.
 
 ## Decisions
 
+- **2026-11-24 — Feedback button.** "Send feedback" in More opens an email to
+  info@tuesdaygames.com with version, iOS, device and full-version status
+  filled in (Mail, else mailto:, else the address to copy). New for Tuesday
+  Games; the other apps only list the address on their support pages. Privacy
+  policy updated: the person sends it, the app collects nothing.
+
 - **2026-11-24 — Full version contents.** Chris: put all of them in. Now:
   song mode, patterns C–H, every premade beat (free: Boom Bap, Four on the
   Floor, Blank). Coming, listed as COMING SOON: export & share, unlimited saves

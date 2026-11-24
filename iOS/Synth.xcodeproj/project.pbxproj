@@ -16,11 +16,13 @@
 		267C208E1BD36658B8DA6F3E /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 02C31D545CCF9AE7158EE85C /* PrivacyInfo.xcprivacy */; };
 		318DDD1F72CA03DEBCB75767 /* AudioEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7797E48F8DBFC06B0063A7E7 /* AudioEngine.swift */; };
 		326681C4EF2F3F7B96B60556 /* DrumScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4846AB4A928DD5AB7AAD8C0E /* DrumScreen.swift */; };
+		381C50952C365FB601124B91 /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C2949A6B74D33BAB91C5D83 /* Feedback.swift */; };
 		514D8E5412465824EB9E0CC3 /* Knob.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADF5A6877CCC7387ABFF776 /* Knob.swift */; };
 		5BFF601E8B5184F9C0B8A8E2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE71B54C8E6B08D322199EA1 /* ContentView.swift */; };
 		663C77935455FD592D466311 /* SynthPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 396B9DCD33081761BDFEC01D /* SynthPanel.swift */; };
 		67D24BD5D755DF39629D2B5A /* ParamInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC28EF50383C70DB8AC5B49C /* ParamInfo.swift */; };
 		67ED109F5342248CD0E76466 /* SynthApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC823F249FD3DB4FA615FA6 /* SynthApp.swift */; };
+		6EFF257A0A3DD9D947CB8E25 /* FeedbackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0971E33278E1DFF22FD6C03 /* FeedbackTests.swift */; };
 		715E1D7D424E495C87DFEAEC /* PixelViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 898AA6286112E32DDC7F88D1 /* PixelViews.swift */; };
 		74572F2763FB853706AF04D0 /* KeyboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5E4F27C07575DA804DFDA0 /* KeyboardView.swift */; };
 		89765189C9A57C7BED39E339 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFBA1C5C7165487FB35CDAA8 /* Theme.swift */; };
@@ -56,6 +58,7 @@
 		2FE3EF2188F92265AB258A58 /* Controls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controls.swift; sourceTree = "<group>"; };
 		3466D041E8EF0490974263C3 /* SynthEngine.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SynthEngine.cpp; sourceTree = "<group>"; };
 		396B9DCD33081761BDFEC01D /* SynthPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynthPanel.swift; sourceTree = "<group>"; };
+		3C2949A6B74D33BAB91C5D83 /* Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feedback.swift; sourceTree = "<group>"; };
 		3C90B85874BD47D3118F1D4E /* Synth.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Synth.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F87C574F9FA6E4DEF3CDFC6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		45FEF9A0D49F4F58FFF39FF7 /* TipJarCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipJarCard.swift; sourceTree = "<group>"; };
@@ -81,6 +84,7 @@
 		9FA5E967B818B9350344ACA2 /* Oscillator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Oscillator.hpp; sourceTree = "<group>"; };
 		ADCBF5CD48047509BCDD038F /* SynthTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SynthTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE30B9FEA7B600468DBC19DA /* EventQueue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = EventQueue.hpp; sourceTree = "<group>"; };
+		C0971E33278E1DFF22FD6C03 /* FeedbackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackTests.swift; sourceTree = "<group>"; };
 		D89C25FF8D2D65427060B5C1 /* Synth-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Synth-Bridging-Header.h"; sourceTree = "<group>"; };
 		DADF5A6877CCC7387ABFF776 /* Knob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Knob.swift; sourceTree = "<group>"; };
 		DD9BC59F0C4B2EB6EFA14FD1 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
@@ -100,6 +104,7 @@
 			children = (
 				2FE3EF2188F92265AB258A58 /* Controls.swift */,
 				4846AB4A928DD5AB7AAD8C0E /* DrumScreen.swift */,
+				3C2949A6B74D33BAB91C5D83 /* Feedback.swift */,
 				DD9BC59F0C4B2EB6EFA14FD1 /* Haptics.swift */,
 				4B5E4F27C07575DA804DFDA0 /* KeyboardView.swift */,
 				DADF5A6877CCC7387ABFF776 /* Knob.swift */,
@@ -189,6 +194,7 @@
 		88A8EB6AB521C1DC9C512331 /* SynthTests */ = {
 			isa = PBXGroup;
 			children = (
+				C0971E33278E1DFF22FD6C03 /* FeedbackTests.swift */,
 				52FB2E11673BC2DB4BF4B7C5 /* StoreTests.swift */,
 				EC75663E483E94DD73484150 /* Synth.storekit */,
 			);
@@ -338,6 +344,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6EFF257A0A3DD9D947CB8E25 /* FeedbackTests.swift in Sources */,
 				F3B29C6ED2669F82BBC86AEB /* StoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -354,6 +361,7 @@
 				0E340AB6F33C637F9A61B1D6 /* DrumMachine.cpp in Sources */,
 				AAAC26006C17E9AC2A3B4D85 /* DrumMachine.swift in Sources */,
 				326681C4EF2F3F7B96B60556 /* DrumScreen.swift in Sources */,
+				381C50952C365FB601124B91 /* Feedback.swift in Sources */,
 				B1D2E5AD6259315D12C6BD3F /* Haptics.swift in Sources */,
 				74572F2763FB853706AF04D0 /* KeyboardView.swift in Sources */,
 				514D8E5412465824EB9E0CC3 /* Knob.swift in Sources */,

@@ -73,6 +73,7 @@ struct MoreSheet: View {
                 Form {
                     fullVersionSection.id(MoreFocus.fullVersion)
                     tipSection.id(MoreFocus.tips)
+                    FeedbackSection()
                     settingsSection
                     aboutSection
                 }
