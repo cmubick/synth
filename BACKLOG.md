@@ -25,7 +25,7 @@ Decisions and to-dos, newest first. The README describes what's built.
 
 ## Open questions
 
-- Turn on GitHub Pages (main, /docs) so the support and privacy pages go live,
+- ~~Turn on GitHub Pages~~ Done 2026-11-24: https://cmubick.github.io/synth/ (main, /docs),
   as Skate, Sevens and Mahjong have (their repos are public too).
 - Update the Tuesday Games site's 808Synth icon to match the new app icon?
 
