@@ -8,6 +8,7 @@ struct SynthApp: App {
     init() {
         let audio = AudioEngine()
         audio.start()
+        Store.shared.start()
         _patch = State(initialValue: SynthPatch(audio: audio))
         _drums = State(initialValue: DrumMachine(audio: audio))
     }

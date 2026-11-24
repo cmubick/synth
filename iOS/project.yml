@@ -41,3 +41,23 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown"
         ENABLE_PREVIEWS: YES
+    scheme:
+      testTargets: [SynthTests]
+      # Lets purchases run locally (simulator and Xcode runs) before the
+      # products exist in App Store Connect, like Sevens and Skate.
+      storeKitConfiguration: SynthTests/Synth.storekit
+
+  SynthTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: SynthTests
+        excludes: ["*.storekit"]
+      - path: SynthTests/Synth.storekit
+        buildPhase: resources
+    dependencies:
+      - target: Synth
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tuesdaygames.synthTests
+        GENERATE_INFOPLIST_FILE: YES

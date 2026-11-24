@@ -1,0 +1,78 @@
+{
+  "identifier" : "808517E1",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : true,
+      "internalID" : "8080000001",
+      "localizations" : [
+        {
+          "description" : "Song mode, patterns C to H and every beat.",
+          "displayName" : "Full Version",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "synth.fullgame",
+      "referenceName" : "Full Version",
+      "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "0.99",
+      "familyShareable" : false,
+      "internalID" : "8080000002",
+      "localizations" : [
+        {
+          "description" : "A small thank-you to Tuesday Games.",
+          "displayName" : "Small tip",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "synth.tip.small",
+      "referenceName" : "Small tip",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "2.99",
+      "familyShareable" : false,
+      "internalID" : "8080000003",
+      "localizations" : [
+        {
+          "description" : "A generous thank-you to Tuesday Games.",
+          "displayName" : "Generous tip",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "synth.tip.medium",
+      "referenceName" : "Generous tip",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "8080000004",
+      "localizations" : [
+        {
+          "description" : "A very generous thank-you to Tuesday Games.",
+          "displayName" : "Big tip",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "synth.tip.large",
+      "referenceName" : "Big tip",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

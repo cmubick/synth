@@ -12,6 +12,8 @@ struct Beat {
     let song: [Int]
     /// Per drum: [param index: value], params are 0 level, 1 tune, 2 decay, 3 tone.
     var kit: [String: [Int: Float]] = [:]
+    /// Free beats load for everyone; the rest are part of the full version.
+    var isFree = false
 
     static func parse(_ row: String) -> [Int] {
         row.compactMap { ch in
@@ -49,7 +51,8 @@ struct Beat {
             ],
         ],
         song: [0, 0, 0, 1, 0, 0, 0, 2],
-        kit: ["BD": [1: 0.45, 2: 0.6], "SD": [3: 0.7]]
+        kit: ["BD": [1: 0.45, 2: 0.6], "SD": [3: 0.7]],
+        isFree: true
     )
 
     static let house = Beat(
@@ -76,7 +79,8 @@ struct Beat {
             ],
         ],
         song: [0, 0, 1, 1, 0, 0, 1, 2],
-        kit: ["BD": [2: 0.4], "OH": [2: 0.35]]
+        kit: ["BD": [2: 0.4], "OH": [2: 0.35]],
+        isFree: true
     )
 
     static let electro = Beat(
@@ -142,5 +146,5 @@ struct Beat {
         kit: ["SD": [1: 0.55, 3: 0.8]]
     )
 
-    static let blank = Beat(name: "Blank", tempo: 120, patterns: [], song: [])
+    static let blank = Beat(name: "Blank", tempo: 120, patterns: [], song: [], isFree: true)
 }

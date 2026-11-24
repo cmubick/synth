@@ -103,6 +103,7 @@ struct DrumPad: View {
                 .updating($isPressed) { _, pressed, _ in
                     if !pressed {
                         pressed = true
+                        Haptics.tap()
                         drums.hitPad(track)
                     }
                 }
@@ -189,6 +190,22 @@ struct PatternBar: View {
                 PatternButton(pattern: p)
             }
 
+            SongButton()
+
+            PatternMenu()
+        }
+    }
+}
+
+/// SONG on/off. Song mode is part of the full version; until it's owned the
+/// button shows a lock and opens the unlock screen instead.
+struct SongButton: View {
+    @Environment(DrumMachine.self) private var drums
+    @Environment(\.openMore) private var openMore
+    private var store: Store { Store.shared }
+
+    var body: some View {
+        if store.isUnlocked {
             Toggle(isOn: Binding(get: { drums.songMode }, set: drums.setSongMode)) {
                 Text("SONG")
                     .font(Theme.titleFont(11))
@@ -197,8 +214,23 @@ struct PatternBar: View {
             .toggleStyle(LitButtonStyle())
             .fixedSize()
             .accessibilityHint("Play patterns in order. Tap patterns to add them to the song.")
-
-            PatternMenu()
+        } else {
+            Button {
+                openMore(.fullVersion)
+            } label: {
+                HStack(spacing: 3) {
+                    Text("SONG").font(Theme.titleFont(11)).tracking(1)
+                    Image(systemName: "lock.fill").font(.system(size: 9, weight: .bold))
+                }
+                .foregroundStyle(Theme.label)
+                .frame(minHeight: 30)
+                .padding(.horizontal, 6)
+                .background(RoundedRectangle(cornerRadius: 6).fill(Theme.button))
+            }
+            .buttonStyle(.plain)
+            .fixedSize()
+            .accessibilityLabel("Song mode, locked")
+            .accessibilityHint("Part of the full version. Opens the unlock screen.")
         }
     }
 }
@@ -206,30 +238,45 @@ struct PatternBar: View {
 struct PatternButton: View {
     let pattern: Int
     @Environment(DrumMachine.self) private var drums
+    @Environment(\.openMore) private var openMore
 
     var body: some View {
         let editing = drums.editPattern == pattern
         let playing = drums.isPlaying && drums.playingPattern == pattern
         let hasSteps = drums.patternHasSteps(pattern)
+        let locked = FullVersion.isLocked(pattern: pattern)
 
         Button {
-            drums.selectPattern(pattern)
+            Haptics.tick()
+            if locked {
+                openMore(.fullVersion)
+            } else {
+                drums.selectPattern(pattern)
+            }
         } label: {
             ZStack(alignment: .topTrailing) {
                 Text(DrumMachine.patternNames[pattern])
                     .font(Theme.titleFont(14))
-                    .foregroundStyle(editing ? Color.black : (hasSteps ? Theme.cream : Theme.label.opacity(0.4)))
+                    .foregroundStyle(editing ? Color.black : (hasSteps && !locked ? Theme.cream : Theme.label.opacity(0.4)))
                     .frame(maxWidth: .infinity, minHeight: 34)
                     .background(RoundedRectangle(cornerRadius: 6).fill(editing ? Theme.accent : Theme.button))
-                Circle()
-                    .fill(playing ? Color.green : Color.clear)
-                    .frame(width: 6, height: 6)
-                    .shadow(color: .green, radius: playing ? 3 : 0)
-                    .padding(4)
+                if locked {
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 7, weight: .bold))
+                        .foregroundStyle(Theme.label.opacity(0.6))
+                        .padding(4)
+                } else {
+                    Circle()
+                        .fill(playing ? Color.green : Color.clear)
+                        .frame(width: 6, height: 6)
+                        .shadow(color: .green, radius: playing ? 3 : 0)
+                        .padding(4)
+                }
             }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Pattern \(DrumMachine.patternNames[pattern])")
+        .accessibilityLabel("Pattern \(DrumMachine.patternNames[pattern])\(locked ? ", locked" : "")")
+        .accessibilityHint(locked ? "Part of the full version. Opens the unlock screen." : "")
         .accessibilityAddTraits(editing ? .isSelected : [])
     }
 }
@@ -248,7 +295,7 @@ struct PatternMenu: View {
             }
             Menu("Copy \(name) To…", systemImage: "doc.on.doc") {
                 ForEach(0..<DrumMachine.patternCount, id: \.self) { p in
-                    if p != drums.editPattern {
+                    if p != drums.editPattern && !FullVersion.isLocked(pattern: p) {
                         Button("Pattern \(DrumMachine.patternNames[p])") { drums.copyPattern(to: p) }
                     }
                 }
@@ -284,7 +331,11 @@ struct SongStrip: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 3) {
                         if drums.song.isEmpty {
-                            Text(drums.songMode ? "Tap patterns above to add them in order" : "Turn on SONG to chain patterns")
+                            Text(drums.songMode
+                                 ? "Tap patterns above to add them in order"
+                                 : (Store.shared.isUnlocked
+                                    ? "Turn on SONG to chain patterns"
+                                    : "Chain patterns into songs with the full version"))
                                 .font(Theme.labelFont(10))
                                 .foregroundStyle(Theme.label.opacity(0.6))
                         }
@@ -371,6 +422,7 @@ struct StepButton: View {
         let isPlayhead = drums.isPlaying && drums.currentStep == step && drums.playingPattern == drums.editPattern
 
         Button {
+            Haptics.tick()
             drums.toggleStep(step)
         } label: {
             VStack(spacing: 0) {

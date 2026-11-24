@@ -1,0 +1,81 @@
+/* 808Synth support and privacy pages. Same layout as Skate's, in the app's
+   colors: dark panel, cream text, orange accent. */
+:root {
+  --accent: #b85a1f;
+  --text: #1c1b19;
+  --muted: #5e574f;
+  --bg: #f7f3ec;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: #ff8a3d;
+    --text: #f0e6d4;
+    --muted: #b8ae9c;
+    --bg: #1c1b19;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Avenir Next", "Segoe UI", sans-serif;
+}
+
+main {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2.5rem 1rem 4rem;
+}
+
+h1 {
+  margin: 0 0 0.25rem;
+  font-size: 2.2rem;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+h2 {
+  margin: 2.2rem 0 0.5rem;
+  font-size: 1.3rem;
+}
+
+h3 {
+  margin: 1.4rem 0 0.3rem;
+  font-size: 1.05rem;
+}
+
+p,
+ul {
+  margin: 0 0 0.9rem;
+}
+
+ul {
+  padding-left: 1.3rem;
+}
+
+li {
+  margin-bottom: 0.35rem;
+}
+
+a {
+  color: var(--accent);
+}
+
+.date,
+.back {
+  color: var(--muted);
+}
+
+.back {
+  margin-bottom: 1.5rem;
+}
+
+.icon {
+  width: 96px;
+  height: 96px;
+  border-radius: 22px;
+  image-rendering: pixelated;
+  margin-bottom: 1rem;
+}

@@ -14,3 +14,4 @@ Engine/build/
 local.properties
 *.iml
 .cxx/
+AppStore/.build/

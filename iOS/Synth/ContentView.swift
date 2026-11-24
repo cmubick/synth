@@ -17,6 +17,10 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var octave = 3 // lowest key is C3
     @State private var tab: AppTab = .synth
+    @State private var showMore = false
+    @State private var moreFocus: MoreFocus?
+    @Environment(DrumMachine.self) private var drums
+    @AppStorage(Settings.keepAwakeKey) private var keepAwake = true
 
     var body: some View {
         GeometryReader { geo in
@@ -71,6 +75,27 @@ struct ContentView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase != .active { patch.audio.allNotesOff() }
         }
+        .environment(\.openMore, OpenMoreAction { focus in
+            moreFocus = focus
+            showMore = true
+        })
+        .sheet(isPresented: $showMore) {
+            MoreSheet(focus: moreFocus)
+                .preferredColorScheme(.dark)
+        }
+        // Don't let the phone dim and lock in the middle of a beat.
+        .onChange(of: drums.isPlaying, initial: true) { updateIdleTimer() }
+        .onChange(of: keepAwake) { updateIdleTimer() }
+        // A refunded purchase turns the full-version features back off.
+        .onChange(of: Store.shared.isUnlocked) { _, unlocked in
+            guard !unlocked else { return }
+            if drums.songMode { drums.setSongMode(false) }
+            if FullVersion.isLocked(pattern: drums.editPattern) { drums.selectPattern(0) }
+        }
+    }
+
+    private func updateIdleTimer() {
+        UIApplication.shared.isIdleTimerDisabled = keepAwake && drums.isPlaying
     }
 
     private func knobSize(panelHeight: CGFloat) -> CGFloat {
@@ -83,8 +108,11 @@ struct TopBar: View {
     @Binding var tab: AppTab
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 6) {
+            // Labels that must never be squeezed keep their size; the
+            // preset/beat name and the volume slider give way on small phones.
             TabSwitch(tab: $tab)
+                .fixedSize()
 
             switch tab {
             case .synth: PresetPicker()
@@ -95,17 +123,16 @@ struct TopBar: View {
 
             if tab == .synth {
                 SegmentSwitch(id: SE_VOICE_MODE, labels: ["POLY", "MONO"])
+                    .fixedSize()
             }
 
             TransportView()
+                .fixedSize()
 
-            HStack(spacing: 4) {
-                Image(systemName: "speaker.wave.2.fill")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Theme.label)
-                VolumeSlider()
-                    .frame(width: 80)
-            }
+            VolumeSlider()
+                .frame(minWidth: 56, maxWidth: 80)
+
+            MoreButton()
         }
     }
 }
@@ -125,7 +152,7 @@ struct TabSwitch: View {
                         Text(t.rawValue).font(Theme.titleFont(11)).tracking(1)
                     }
                     .foregroundStyle(isOn ? Color.black : Theme.label)
-                    .padding(.horizontal, 10)
+                    .padding(.horizontal, 8)
                     .frame(height: 30)
                     .background(RoundedRectangle(cornerRadius: 5).fill(isOn ? Theme.cream : Color.clear))
                 }
@@ -160,7 +187,9 @@ struct PresetPicker: View {
                 Text(patch.presetName)
                     .font(Theme.titleFont(13))
                     .foregroundStyle(Theme.accent)
-                    .frame(minWidth: 110)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                    .frame(minWidth: 64, maxWidth: 120)
                     .padding(.vertical, 7)
             }
             stepButton("chevron.right", by: 1)

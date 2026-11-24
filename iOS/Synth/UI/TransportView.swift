@@ -8,6 +8,7 @@ struct TransportView: View {
     var body: some View {
         HStack(spacing: 6) {
             Button {
+                Haptics.thump()
                 drums.togglePlay()
             } label: {
                 Image(systemName: drums.isPlaying ? "stop.fill" : "play.fill")
@@ -83,12 +84,19 @@ struct TempoDisplay: View {
 
 struct BeatPicker: View {
     @Environment(DrumMachine.self) private var drums
+    @Environment(\.openMore) private var openMore
 
     var body: some View {
         Menu {
             Section("Premade beats") {
                 ForEach(Beat.factory.indices, id: \.self) { i in
-                    Button(Beat.factory[i].name) { drums.load(Beat.factory[i]) }
+                    let beat = Beat.factory[i]
+                    if FullVersion.isLocked(beat) {
+                        // Locked beats stay in the list, so players can see what the full version adds.
+                        Button(beat.name, systemImage: "lock.fill") { openMore(.fullVersion) }
+                    } else {
+                        Button(beat.name) { drums.load(beat) }
+                    }
                 }
             }
         } label: {
@@ -98,12 +106,13 @@ struct BeatPicker: View {
                 Text(drums.beatName)
                     .font(Theme.titleFont(13))
                     .lineLimit(1)
+                    .minimumScaleFactor(0.75)
                 Image(systemName: "chevron.down")
                     .font(.system(size: 9, weight: .bold))
             }
             .foregroundStyle(Theme.accent)
             .padding(.horizontal, 10)
-            .frame(minWidth: 150, minHeight: 34)
+            .frame(minWidth: 96, maxWidth: 190, minHeight: 34)
             .background(RoundedRectangle(cornerRadius: 7).fill(Color.black.opacity(0.5)))
             .overlay(RoundedRectangle(cornerRadius: 7).stroke(Theme.moduleEdge))
         }
