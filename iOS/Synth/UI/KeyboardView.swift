@@ -17,6 +17,11 @@ struct KeyboardView: UIViewRepresentable {
         return view
     }
 
+    /// Switching tabs removes the keyboard; don't leave notes hanging.
+    static func dismantleUIView(_ view: KeyboardUIView, coordinator: ()) {
+        view.releaseAll()
+    }
+
     func updateUIView(_ view: KeyboardUIView, context: Context) {
         view.onNoteOn = onNoteOn
         view.onNoteOff = onNoteOff

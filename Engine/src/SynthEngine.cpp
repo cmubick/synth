@@ -28,6 +28,7 @@ void SynthEngine::setSampleRate(double sampleRate) {
     smoothCoef_ = smoothingCoef(0.01f, sampleRate_);
     delaySmoothCoef_ = smoothingCoef(0.15f, sampleRate_);
     delay_.prepare(sampleRate_, kMaxDelaySeconds);
+    drums_.setSampleRate(sampleRate_);
 
     cutoffSmoothed_ = p(SE_FILTER_CUTOFF);
     volumeSmoothed_ = mapping::volumeGain(p(SE_MASTER_VOLUME));
@@ -53,6 +54,16 @@ void SynthEngine::noteOff(int note) {
 }
 
 void SynthEngine::allNotesOff() { events_.push({NoteEvent::kAllOff, 0, 0.0f}); }
+
+void SynthEngine::drumHit(int track, float velocity) {
+    if (track < 0 || track >= DrumMachine::kTracks) return;
+    events_.push({NoteEvent::kDrumHit, static_cast<int8_t>(track), clampf(velocity, 0.0f, 1.0f)});
+}
+
+void SynthEngine::drumRecord(int track, bool accent) {
+    if (track < 0 || track >= DrumMachine::kTracks) return;
+    events_.push({NoteEvent::kDrumRecord, static_cast<int8_t>(track), accent ? 1.0f : 0.5f});
+}
 
 void SynthEngine::setParam(se_param id, float value) {
     if (id < 0 || id >= SE_PARAM_COUNT) return;
@@ -80,6 +91,12 @@ void SynthEngine::handle(const NoteEvent &e) {
         break;
     case NoteEvent::kAllOff:
         releaseAll();
+        break;
+    case NoteEvent::kDrumHit:
+        drums_.trigger(e.note, e.velocity);
+        break;
+    case NoteEvent::kDrumRecord:
+        drums_.recordHit(e.note, e.velocity > 0.9f);
         break;
     }
 }
@@ -204,6 +221,8 @@ void SynthEngine::render(float *left, float *right, int frames) {
         lastVoiceMode_ = voiceMode;
     }
 
+    drums_.beginBlock();
+
     NoteEvent e;
     while (events_.pop(e)) handle(e);
 
@@ -299,8 +318,12 @@ void SynthEngine::render(float *left, float *right, int frames) {
 
         float l, r;
         delay_.process(sum, delayTimeSmoothed_ * sr, delayFeedback, delayMix, l, r);
-        left[i] = softClip(l * volumeSmoothed_);
-        right[i] = softClip(r * volumeSmoothed_);
+
+        // Drums join after the synth's echo so beats stay tight and dry.
+        float dl, dr;
+        drums_.process(random_, dl, dr);
+        left[i] = softClip((l + dl) * volumeSmoothed_);
+        right[i] = softClip((r + dr) * volumeSmoothed_);
     }
 }
 

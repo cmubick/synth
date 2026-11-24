@@ -2,39 +2,45 @@ import SwiftUI
 
 /// A rotary knob. Drag up/down to turn it, double-tap to reset.
 /// While turning, the label shows the value (e.g. "1.2 kHz").
-struct Knob: View {
-    let id: se_param
-    var label: String? = nil
+struct RotaryKnob: View {
+    let label: String
+    let value: Float
+    let range: ClosedRange<Float>
+    let defaultValue: Float
+    var bipolar = false
     var scale: CGFloat = 1
+    var accessibilityStep: Float? = nil
+    let format: (Float) -> String
+    let onChange: (Float) -> Void
 
-    @Environment(SynthPatch.self) private var patch
     @Environment(\.knobSize) private var baseSize
     // Resets automatically when the drag ends *or* is cancelled (e.g. by scrolling).
     @GestureState private var dragStart: Float?
 
     var body: some View {
-        let info = ParamInfo.of(id)
-        let value = patch[id]
+        let span = range.upperBound - range.lowerBound
+        let norm = CGFloat((value - range.lowerBound) / span)
         let size = baseSize * scale
         let isDragging = dragStart != nil
 
         VStack(spacing: 3) {
-            KnobFace(norm: CGFloat(info.normalized(value)), bipolar: info.isBipolar, active: isDragging)
+            KnobFace(norm: norm, bipolar: bipolar, active: isDragging)
                 .frame(width: size, height: size)
                 .contentShape(Circle())
                 .highPriorityGesture(
                     DragGesture(minimumDistance: 1)
                         .updating($dragStart) { drag, start, _ in
-                            if start == nil { start = patch[id] }
+                            if start == nil { start = value }
                             // A full sweep takes ~3 knob-heights of finger travel (at least 150 pt).
                             let travel = Float(max(150, size * 3.2))
-                            let delta = Float(-drag.translation.height) / travel * (info.max - info.min)
-                            patch[id] = start! + delta
+                            let delta = Float(-drag.translation.height) / travel * span
+                            let newValue = min(max(start! + delta, range.lowerBound), range.upperBound)
+                            onChange(newValue)
                         }
                 )
-                .onTapGesture(count: 2) { patch[id] = info.defaultValue }
+                .onTapGesture(count: 2) { onChange(defaultValue) }
 
-            Text(isDragging ? info.format(value) : (label ?? info.name))
+            Text(isDragging ? format(value) : label)
                 .font(Theme.labelFont())
                 .foregroundStyle(isDragging ? Theme.accent : Theme.label)
                 .lineLimit(1)
@@ -42,12 +48,37 @@ struct Knob: View {
                 .frame(width: size + 16)
         }
         .accessibilityElement()
-        .accessibilityLabel(label ?? info.name)
-        .accessibilityValue(info.format(value))
+        .accessibilityLabel(label)
+        .accessibilityValue(format(value))
         .accessibilityAdjustableAction { direction in
-            let step = info.isDiscrete ? 1 : (info.max - info.min) / 20
-            patch[id] = value + (direction == .increment ? step : -step)
+            let step = accessibilityStep ?? span / 20
+            let next = value + (direction == .increment ? step : -step)
+            onChange(min(max(next, range.lowerBound), range.upperBound))
         }
+    }
+}
+
+/// A knob wired to one of the synth's sound parameters.
+struct Knob: View {
+    let id: se_param
+    var label: String? = nil
+    var scale: CGFloat = 1
+
+    @Environment(SynthPatch.self) private var patch
+
+    var body: some View {
+        let info = ParamInfo.of(id)
+        RotaryKnob(
+            label: label ?? info.name,
+            value: patch[id],
+            range: info.min...info.max,
+            defaultValue: info.defaultValue,
+            bipolar: info.isBipolar,
+            scale: scale,
+            accessibilityStep: info.isDiscrete ? 1 : nil,
+            format: info.format,
+            onChange: { patch[id] = $0 }
+        )
     }
 }
 

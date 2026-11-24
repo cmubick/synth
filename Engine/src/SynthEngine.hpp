@@ -7,6 +7,7 @@
 #include "dsp/LadderFilter.hpp"
 #include "dsp/Oscillator.hpp"
 #include "dsp/StereoDelay.hpp"
+#include "drums/DrumMachine.hpp"
 
 #include <array>
 #include <atomic>
@@ -16,7 +17,7 @@ namespace synth {
 const se_param_info &paramInfo(se_param p);
 
 struct NoteEvent {
-    enum Type : uint8_t { kNoteOn, kNoteOff, kAllOff };
+    enum Type : uint8_t { kNoteOn, kNoteOff, kAllOff, kDrumHit, kDrumRecord };
     Type type = kNoteOn;
     int8_t note = 0;
     float velocity = 0.0f;
@@ -48,6 +49,13 @@ public:
     void noteOn(int note, float velocity);
     void noteOff(int note);
     void allNotesOff();
+
+    // Drums played live (pads). Routed through the event queue so they
+    // land on the audio thread like notes do.
+    void drumHit(int track, float velocity);
+    void drumRecord(int track, bool accent);
+    DrumMachine &drums() { return drums_; }
+    const DrumMachine &drums() const { return drums_; }
 
     void setParam(se_param p, float value);
     float param(se_param p) const;
@@ -91,6 +99,7 @@ private:
     float delaySmoothCoef_ = 0.0f;
 
     StereoDelay delay_;
+    DrumMachine drums_;
 };
 
 } // namespace synth

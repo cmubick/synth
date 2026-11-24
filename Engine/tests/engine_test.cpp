@@ -49,6 +49,16 @@ Stats render(se_engine *e, double seconds, std::vector<float> *out = nullptr) {
     return s;
 }
 
+/* Render an exact number of samples (to test sample-accurate timing). */
+void renderFrames(se_engine *e, int frames) {
+    float l[kBlock], r[kBlock];
+    while (frames > 0) {
+        const int n = frames < kBlock ? frames : kBlock;
+        se_render(e, l, r, n);
+        frames -= n;
+    }
+}
+
 void writeWav(const std::string &path, const std::vector<float> &stereo) {
     FILE *f = std::fopen(path.c_str(), "wb");
     if (!f) return;
@@ -149,6 +159,118 @@ int main(int argc, char **argv) {
         check(worst.finite, "self-oscillating filter stays finite");
         check(worst.peak <= 1.0f, "self-oscillating filter stays within -1..1");
         render(e, 0.5, &audio);
+    }
+
+    std::printf("Drum sounds\n");
+    {
+        se_set_param(e, SE_VOICE_MODE, 0);
+        se_all_notes_off(e);
+        render(e, 3.0);
+        bool ok = true;
+        for (int t = 0; t < SE_DRUM_TRACKS; ++t) {
+            se_drum_trigger(e, t, 1.0f);
+            Stats s = render(e, 0.6, &audio);
+            std::printf("  %-10s peak %.2f\n", se_drum_name(t), s.peak);
+            if (!s.finite || s.peak > 1.0f || s.peak < 0.05f) ok = false;
+        }
+        check(ok, "every drum is audible, finite and within -1..1");
+        render(e, 2.0);
+    }
+
+    std::printf("Sequencer timing (120 BPM = 6000 samples per 16th at 48 kHz)\n");
+    {
+        se_engine *d = se_create(kSampleRate);
+        for (int s = 0; s < SE_SEQ_STEPS; ++s) se_seq_set_step(d, 0, 0, s, 1);
+        se_seq_set_tempo(d, 120);
+        se_seq_play(d);
+        renderFrames(d, 24000);
+        check(se_drum_hit_count(d, 0) == 4, "4 hits in the first 24000 samples");
+        renderFrames(d, 1);
+        check(se_drum_hit_count(d, 0) == 5, "5th hit lands exactly on sample 24000");
+
+        se_seq_stop(d);
+        renderFrames(d, 256);
+        check(se_seq_current_step(d) == -1, "stop resets the playhead");
+
+        se_seq_set_swing(d, 1.0f);
+        const uint32_t before = se_drum_hit_count(d, 0);
+        se_seq_play(d);
+        renderFrames(d, 9000);
+        check(se_drum_hit_count(d, 0) - before == 1, "full swing: 2nd step is late (not before sample 9000)");
+        renderFrames(d, 1);
+        check(se_drum_hit_count(d, 0) - before == 2, "full swing: 2nd step lands at 9000");
+        renderFrames(d, 3000);
+        check(se_drum_hit_count(d, 0) - before == 3, "full swing: 3rd step lands 3000 later (on the beat)");
+        se_destroy(d);
+    }
+
+    std::printf("Patterns and song chain\n");
+    {
+        se_engine *d = se_create(kSampleRate);
+        se_seq_set_step(d, 0, 0, 0, 1); // pattern A: kick on 1
+        se_seq_set_step(d, 1, 1, 0, 1); // pattern B: snare on 1
+        const int32_t song[] = {0, 1, 1};
+        se_seq_set_chain(d, song, 3);
+        se_seq_play(d);
+        renderFrames(d, 96000 * 3);
+        check(se_drum_hit_count(d, 0) == 1 && se_drum_hit_count(d, 1) == 2, "song A,B,B plays one kick then two snares");
+        renderFrames(d, 1);
+        check(se_drum_hit_count(d, 0) == 2, "song loops back to A");
+
+        const int32_t onlyB[] = {1};
+        renderFrames(d, 6000 * 4);
+        se_seq_set_chain(d, onlyB, 1);
+        renderFrames(d, 6000 * 4);
+        check(se_seq_current_pattern(d) == 0, "switching pattern waits for the end of the bar");
+        renderFrames(d, 96000);
+        check(se_seq_current_pattern(d) == 1, "then switches to the new pattern");
+
+        se_seq_set_length(d, 1, 3);
+        const uint32_t snares = se_drum_hit_count(d, 1);
+        renderFrames(d, 6000 * 6);
+        check(se_drum_hit_count(d, 1) - snares == 2, "a 3-step pattern loops every 3 steps");
+        se_destroy(d);
+    }
+
+    std::printf("Live recording\n");
+    {
+        se_engine *d = se_create(kSampleRate);
+        se_seq_play(d);
+        renderFrames(d, 6000 * 2 + 4500); // 3/4 of the way through step 3
+        se_seq_record_hit(d, 0, 0);
+        renderFrames(d, 1);
+        check(se_seq_get_step(d, 0, 0, 3) == 1, "a late hit snaps forward to the next step");
+        check(se_seq_edit_count(d) == 1, "edit counter tells the UI to refresh");
+        renderFrames(d, 6000);
+        check(se_drum_hit_count(d, 0) == 1, "and isn't played twice");
+        renderFrames(d, 1200); // just after step 4 starts
+        se_seq_record_hit(d, 1, 1);
+        renderFrames(d, 1);
+        check(se_seq_get_step(d, 0, 1, 4) == 2, "an early-in-step hit lands on that step, with accent");
+        se_destroy(d);
+    }
+
+    std::printf("Beat (written to the WAV)\n");
+    {
+        se_engine *d = se_create(kSampleRate);
+        const char *rows[] = {
+            "x.....x...x.....", // kick
+            "....x.......x...", // snare
+            "",
+            "", "", "", "",
+            "x.x.x.x.x.x.x.x.", // closed hat
+            "..............x.", // open hat
+        };
+        for (int t = 0; t < 9; ++t)
+            for (int s = 0; rows[t][s]; ++s)
+                if (rows[t][s] == 'x') se_seq_set_step(d, 0, t, s, 1);
+        se_seq_set_tempo(d, 96);
+        se_seq_set_swing(d, 0.3f);
+        se_seq_play(d);
+        Stats s = render(d, 6.0, &audio);
+        check(s.finite && s.peak <= 1.0f && s.rms > 0.02, "beat is audible, finite and in range");
+        std::printf("  beat peak %.2f, rms %.1f dBFS\n", s.peak, 20 * std::log10(s.rms));
+        se_destroy(d);
     }
 
     std::printf("Speed\n");

@@ -106,6 +106,67 @@ int32_t se_param_get_info(se_param param, se_param_info *out); /* 0 = ok */
 int32_t se_param_format(se_param param, float value, char *buffer, int32_t buffer_size);
 int32_t se_param_find(const char *key); /* index, or -1 if unknown */
 
+/* ------------------------------------------------------------------------
+ * Drum machine: an 808-style kit plus a step sequencer.
+ *
+ * Tracks (in order): kick, snare, clap, low tom, high tom, rim, cowbell,
+ * closed hat, open hat, cymbal. A pattern is 16 steps per track; each
+ * step is 0 (off), 1 (on) or 2 (accent). Patterns play in a "chain":
+ * one pattern looping, or a list of patterns forming a song. A new chain
+ * takes effect at the end of the current bar, so switching patterns
+ * while playing stays on the beat.
+ * ---------------------------------------------------------------------- */
+
+#define SE_DRUM_TRACKS 10
+#define SE_SEQ_STEPS 16
+#define SE_SEQ_PATTERNS 8
+#define SE_SEQ_MAX_CHAIN 64
+
+typedef enum se_drum_param : int32_t {
+    SE_DRUM_LEVEL = 0,  /* 0..1 */
+    SE_DRUM_TUNE,       /* 0..1, 0.5 = classic pitch, +/- one octave */
+    SE_DRUM_DECAY,      /* 0..1, 0.5 = classic length */
+    SE_DRUM_TONE,       /* 0..1, a color control that differs per drum */
+    SE_DRUM_PARAM_COUNT
+} se_drum_param;
+
+const char *se_drum_name(int32_t track);        /* "Kick" */
+const char *se_drum_short_name(int32_t track);  /* "BD" */
+const char *se_drum_param_name(int32_t track, se_drum_param param); /* "Tone" may be "Click", "Snap"... */
+float se_drum_param_default(int32_t track, se_drum_param param);
+int32_t se_drum_param_format(se_drum_param param, float value, char *buffer, int32_t buffer_size);
+
+void se_drum_trigger(se_engine *engine, int32_t track, float velocity);
+void se_drum_set_param(se_engine *engine, int32_t track, se_drum_param param, float value);
+float se_drum_get_param(const se_engine *engine, int32_t track, se_drum_param param);
+void se_drum_set_volume(se_engine *engine, float volume); /* 0..1, the whole kit */
+float se_drum_get_volume(const se_engine *engine);
+/* Goes up by one every time the track plays; the UI watches it to flash pads. */
+uint32_t se_drum_hit_count(const se_engine *engine, int32_t track);
+
+void se_seq_set_step(se_engine *engine, int32_t pattern, int32_t track, int32_t step, int32_t value);
+int32_t se_seq_get_step(const se_engine *engine, int32_t pattern, int32_t track, int32_t step);
+void se_seq_set_length(se_engine *engine, int32_t pattern, int32_t steps); /* 1..16 */
+int32_t se_seq_get_length(const se_engine *engine, int32_t pattern);
+void se_seq_set_tempo(se_engine *engine, float bpm); /* 40..240 */
+float se_seq_get_tempo(const se_engine *engine);
+void se_seq_set_swing(se_engine *engine, float amount); /* 0 straight .. 1 heavy shuffle */
+float se_seq_get_swing(const se_engine *engine);
+void se_seq_set_chain(se_engine *engine, const int32_t *patterns, int32_t count);
+
+void se_seq_play(se_engine *engine);
+void se_seq_stop(se_engine *engine);
+int32_t se_seq_is_playing(const se_engine *engine);
+int32_t se_seq_current_step(const se_engine *engine);    /* -1 when stopped */
+int32_t se_seq_current_pattern(const se_engine *engine);
+int32_t se_seq_chain_position(const se_engine *engine);
+/* Goes up by one whenever the engine itself changes steps (live recording). */
+uint32_t se_seq_edit_count(const se_engine *engine);
+
+/* Play a drum now and, if the sequencer is running, write it into the
+ * playing pattern at the nearest step. */
+void se_seq_record_hit(se_engine *engine, int32_t track, int32_t accent);
+
 #ifdef __cplusplus
 }
 #endif

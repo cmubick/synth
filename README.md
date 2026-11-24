@@ -9,6 +9,7 @@ A synth and drum machine for your phone — a classic analog-style synth and an
 Engine/              Shared C++ sound engine (used by iOS now, Android later)
   include/           The plain C API both apps call (synth_engine.h)
   src/               Synth voices, ladder filter, envelopes, LFO, echo
+  src/drums/         808-style drum voices and the step sequencer
   tests/             Desktop test: checks the engine and writes a WAV
 iOS/                 The iPhone / iPad app (SwiftUI)
   project.yml        Xcode project definition (XcodeGen)
@@ -43,8 +44,8 @@ Builds the engine for your Mac, checks levels, stability and speed, and writes
 
 ## Roadmap
 
-1. **Synth** — oscillators, ladder filter, envelopes, LFO, echo, keyboard, built-in sounds ← *in progress*
-2. **Drum machine** — 808-style synthesized kit, 16-step sequencer, tempo/swing, patterns, song chains
+1. **Synth** — oscillators, ladder filter, envelopes, LFO, echo, keyboard, built-in sounds ✓
+2. **Drum machine** — 808-style synthesized kit, 16-step sequencer, tempo/swing, patterns A–H, song chains, live recording, premade beats ✓
 3. **Sampler** — record from the mic or an audio interface, trim, play from pads/keys
 4. **Save & export** — projects, export WAV/M4A, share
 5. **Extras** — MIDI in/out and sync, premade demo tracks

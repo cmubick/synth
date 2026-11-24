@@ -1,9 +1,22 @@
 import SwiftUI
 
+enum AppTab: String, CaseIterable {
+    case synth = "SYNTH"
+    case drums = "DRUMS"
+
+    var symbol: String {
+        switch self {
+        case .synth: "pianokeys"
+        case .drums: "square.grid.3x2.fill"
+        }
+    }
+}
+
 struct ContentView: View {
     @Environment(SynthPatch.self) private var patch
     @Environment(\.scenePhase) private var scenePhase
     @State private var octave = 3 // lowest key is C3
+    @State private var tab: AppTab = .synth
 
     var body: some View {
         GeometryReader { geo in
@@ -23,23 +36,28 @@ struct ContentView: View {
                 .ignoresSafeArea()
 
                 VStack(spacing: 8) {
-                    TopBar()
+                    TopBar(tab: $tab)
                         .frame(height: 40)
 
-                    SynthPanel()
-                        .frame(height: panelHeight)
-                        .environment(\.knobSize, knobSize(panelHeight: panelHeight))
-                        .environment(\.faderHeight, panelHeight - 58)
+                    switch tab {
+                    case .synth:
+                        SynthPanel()
+                            .frame(height: panelHeight)
+                            .environment(\.knobSize, knobSize(panelHeight: panelHeight))
+                            .environment(\.faderHeight, panelHeight - 58)
 
-                    HStack(spacing: 8) {
-                        OctaveControl(octave: $octave)
-                        KeyboardView(
-                            lowestNote: (octave + 1) * 12,
-                            onNoteOn: { patch.audio.noteOn($0, velocity: $1) },
-                            onNoteOff: { patch.audio.noteOff($0) }
-                        )
-                        .background(Color.black)
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        HStack(spacing: 8) {
+                            OctaveControl(octave: $octave)
+                            KeyboardView(
+                                lowestNote: (octave + 1) * 12,
+                                onNoteOn: { patch.audio.noteOn($0, velocity: $1) },
+                                onNoteOff: { patch.audio.noteOff($0) }
+                            )
+                            .background(Color.black)
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                        }
+                    case .drums:
+                        DrumScreen()
                     }
                 }
                 .padding(.leading, woodLeading - insets.leading + 8)
@@ -62,29 +80,61 @@ struct ContentView: View {
 }
 
 struct TopBar: View {
-    @Environment(SynthPatch.self) private var patch
+    @Binding var tab: AppTab
 
     var body: some View {
-        HStack(spacing: 12) {
-            Text("SYNTH")
-                .font(Theme.titleFont(18))
-                .tracking(4)
-                .foregroundStyle(Theme.cream)
+        HStack(spacing: 10) {
+            TabSwitch(tab: $tab)
 
-            PresetPicker()
+            switch tab {
+            case .synth: PresetPicker()
+            case .drums: BeatPicker()
+            }
 
-            Spacer(minLength: 8)
+            Spacer(minLength: 4)
 
-            SegmentSwitch(id: SE_VOICE_MODE, labels: ["POLY", "MONO"])
+            if tab == .synth {
+                SegmentSwitch(id: SE_VOICE_MODE, labels: ["POLY", "MONO"])
+            }
 
-            HStack(spacing: 6) {
+            TransportView()
+
+            HStack(spacing: 4) {
                 Image(systemName: "speaker.wave.2.fill")
-                    .font(.system(size: 12))
+                    .font(.system(size: 11))
                     .foregroundStyle(Theme.label)
                 VolumeSlider()
-                    .frame(width: 110)
+                    .frame(width: 80)
             }
         }
+    }
+}
+
+struct TabSwitch: View {
+    @Binding var tab: AppTab
+
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(AppTab.allCases, id: \.self) { t in
+                let isOn = t == tab
+                Button {
+                    tab = t
+                } label: {
+                    HStack(spacing: 5) {
+                        Image(systemName: t.symbol).font(.system(size: 11, weight: .semibold))
+                        Text(t.rawValue).font(Theme.titleFont(11)).tracking(1)
+                    }
+                    .foregroundStyle(isOn ? Color.black : Theme.label)
+                    .padding(.horizontal, 10)
+                    .frame(height: 30)
+                    .background(RoundedRectangle(cornerRadius: 5).fill(isOn ? Theme.cream : Color.clear))
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(isOn ? .isSelected : [])
+            }
+        }
+        .padding(2)
+        .background(RoundedRectangle(cornerRadius: 7).fill(Theme.button))
     }
 }
 

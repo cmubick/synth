@@ -10,5 +10,6 @@ add_library(synth_engine STATIC
     src/SynthEngine.cpp
     src/Params.cpp
     src/CApi.cpp
+    src/drums/DrumMachine.cpp
 )
 target_include_directories(synth_engine PUBLIC include PRIVATE src)
