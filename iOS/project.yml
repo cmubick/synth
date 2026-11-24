@@ -2,7 +2,7 @@
 # the Xcode project with:  cd iOS && xcodegen
 name: Synth
 options:
-  bundleIdPrefix: com.example
+  bundleIdPrefix: com.tuesdaygames
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true
@@ -13,7 +13,8 @@ settings:
     CLANG_CXX_LANGUAGE_STANDARD: "c++17"
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
-    DEVELOPMENT_TEAM: ""
+    DEVELOPMENT_TEAM: ZYW8AH3KQP
+    CODE_SIGN_STYLE: Automatic
 
 targets:
   Synth:
@@ -27,13 +28,14 @@ targets:
         group: Engine
     settings:
       base:
-        # Change to your own reverse-domain id before putting it on a device.
-        PRODUCT_BUNDLE_IDENTIFIER: com.example.synth
+        # "808synth" can't be used here: Android IDs can't start a part with a digit,
+        # and the Android port should share this ID. Store products are synth.*.
+        PRODUCT_BUNDLE_IDENTIFIER: com.tuesdaygames.synth
         SWIFT_OBJC_BRIDGING_HEADER: Synth/Synth-Bridging-Header.h
         HEADER_SEARCH_PATHS: $(SRCROOT)/../Engine/include
         TARGETED_DEVICE_FAMILY: "1,2"
         GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_CFBundleDisplayName: Synth
+        INFOPLIST_KEY_CFBundleDisplayName: 808Synth
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UIStatusBarHidden: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"

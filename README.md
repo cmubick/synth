@@ -1,7 +1,12 @@
-# Synth
+# 808Synth
 
 A synth and drum machine for your phone — a classic analog-style synth and an
-808-style drum machine in one fun, easy app. iOS first, Android later.
+808-style drum machine in one fun, easy app. A Tuesday Games app; iOS first,
+Android later.
+
+- App name: **808Synth** · bundle ID `com.tuesdaygames.synth` · team ZYW8AH3KQP
+- The Xcode project and target are named `Synth` (a Swift module name can't
+  start with a digit); only the name on the home screen is 808Synth.
 
 ## Project layout
 
