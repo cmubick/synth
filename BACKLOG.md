@@ -4,6 +4,13 @@ Decisions and to-dos, newest first. The README describes what's built.
 
 ## Decisions
 
+- **2026-11-24 — Android port.** `android/`, set up like Sevens', Skate's and
+  Mahjong's ports (Gradle Kotlin DSL, Compose, Play Billing, same versions,
+  intent-extra debug switches, parity tests that read the Swift). Unlike them
+  the rules aren't re-written in Kotlin: the shared C++ `Engine/` is compiled
+  in with the NDK (CMake), and audio goes out through AAudio rather than
+  Oboe, to add no library. minSdk 26 like the others.
+
 - **2026-11-24 — Feedback button.** "Send feedback" in More opens an email to
   info@tuesdaygames.com with version, iOS, device and full-version status
   filled in (Mail, else mailto:, else the address to copy). New for Tuesday
@@ -42,5 +49,6 @@ Decisions and to-dos, newest first. The README describes what's built.
   the free limits and locks, and update the privacy policy (microphone, saved
   files).
 - Phase 3: sampler and mic recording. Phase 4: save & export. Phase 5: MIDI.
-  Phase 6: Android.
+- Android: Play Console listing, data safety form, signing key; test audio
+  delay on real phones (older and cheaper ones especially).
 - Synth parts in the sequencer (basslines), after saving exists.

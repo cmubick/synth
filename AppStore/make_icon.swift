@@ -21,7 +21,31 @@ struct MakeIcon {
         try write(icon, scale: 32, to: root.appendingPathComponent("AppStore/icon/icon-1024.png"))
         // A small sharp copy for the support page (whole-pixel scale, no blur).
         try write(icon, scale: 6, to: root.appendingPathComponent("docs/icon.png"))
-        print("wrote the icon to the asset catalog, AppStore/icon/ and docs/")
+        try writeAndroid(icon, res: root.appendingPathComponent("android/app/src/main/res"))
+        print("wrote the icon to the asset catalog, AppStore/icon/, docs/ and the Android launcher")
+    }
+
+    /// The Android launcher icon, done the way Skate's is (android/tools/icon there).
+    /// Android crops icons to a circle, squircle or square of the phone's choosing,
+    /// from a 108 dp layer of which the middle 72 dp shows. So the 32 x 32 picture is
+    /// drawn 64 dp wide in the middle, in whole screen pixels so it stays sharp, and
+    /// its edge pixels are stretched out to the sides: whatever shape the phone cuts,
+    /// it cuts walnut and panel, not the 808.
+    static func writeAndroid(_ grid: PixelGrid, res: URL) throws {
+        for (folder, density) in [("mdpi", 1), ("hdpi", 1.5), ("xhdpi", 2), ("xxhdpi", 3), ("xxxhdpi", 4)] as [(String, Double)] {
+            let size = Int(108 * density)
+            let square = Int(2 * density) // screen pixels per picture pixel: the picture is 64 dp
+            let offset = (size - grid.width * square) / 2
+            var big = PixelGrid(width: size, height: size)
+            for y in 0..<size {
+                for x in 0..<size {
+                    let column = min(grid.width - 1, max(0, x - offset < 0 ? 0 : (x - offset) / square))
+                    let row = min(grid.height - 1, max(0, y - offset < 0 ? 0 : (y - offset) / square))
+                    big[x, y] = grid[column, row]
+                }
+            }
+            try write(big, scale: 1, to: res.appendingPathComponent("mipmap-\(folder)/ic_launcher_background.png"))
+        }
     }
 
     /// The picture, one character per pixel decision.

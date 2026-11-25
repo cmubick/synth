@@ -1,8 +1,8 @@
 # 808Synth
 
 A synth and drum machine for your phone — a classic analog-style synth and an
-808-style drum machine in one fun, easy app. A Tuesday Games app; iOS first,
-Android later.
+808-style drum machine in one fun, easy app. A Tuesday Games app for iPhone and
+iPad (`iOS/`) and Android (`android/`, see its README).
 
 - App name: **808Synth** · bundle ID `com.tuesdaygames.synth` · team ZYW8AH3KQP
 - The Xcode project and target are named `Synth` (a Swift module name can't
@@ -26,11 +26,13 @@ iOS/                 The iPhone / iPad app (SwiftUI)
   SynthTests/        Store tests and Synth.storekit (local test products)
 AppStore/            App Store listing notes, icon script and icon
 docs/                Support and privacy pages (GitHub Pages)
+android/             The Android app (Kotlin, Compose), on the same C++ engine; see android/README.md
 BACKLOG.md           Decisions and to-dos
 ```
 
 All sound is made in `Engine/`. The apps only draw the controls and pass
-notes and knob values to it, so the Android version can reuse the engine as is.
+notes and knob values to it: the iPhone app compiles it in Xcode, and the
+Android app compiles the very same files with the NDK.
 
 ## Running the iOS app
 
@@ -75,7 +77,7 @@ The ☰ button at the top right opens **More**:
   the icon script shares it.
 - **App icon**: 8-bit, drawn by `AppStore/make_icon.swift`. Run
   `AppStore/make_icon.sh` to remake it; it writes the asset catalog,
-  `AppStore/icon/icon-1024.png` and `docs/icon.png`.
+  `AppStore/icon/icon-1024.png`, `docs/icon.png` and the Android launcher icons.
 - **Support and privacy pages**: `docs/index.html` and `docs/privacy.html`, for
   GitHub Pages at `https://cmubick.github.io/synth/` (Pages must be turned on
   for the repo). The app itself has no links to websites, like Skate.
@@ -113,4 +115,4 @@ Builds the engine for your Mac, checks levels, stability and speed, and writes
 3. **Sampler** — record from the mic or an audio interface, trim, play from pads/keys
 4. **Save & export** — projects, export WAV/M4A, share
 5. **Extras** — MIDI in/out and sync, premade demo tracks
-6. **Android** — Kotlin/Compose UI on the same engine (Oboe audio)
+6. **Android** — Kotlin/Compose UI on the same engine, AAudio output ← *first version done: synth, drums, store, More, icon*

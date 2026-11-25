@@ -1,0 +1,14 @@
+# Gradle and Android Studio output. Nothing here is source.
+.gradle/
+.kotlin/
+build/
+local.properties
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.jks
+*.keystore
